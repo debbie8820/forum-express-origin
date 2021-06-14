@@ -4,7 +4,7 @@ const port = 3000
 const exphbs = require('express-handlebars')
 
 
-app.use('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' })) //handlebars註冊樣板引擎
+app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' })) //handlebars註冊樣板引擎
 app.set('view engine', 'hbs')
 
 app.listen(port, () => {
@@ -12,5 +12,4 @@ app.listen(port, () => {
 })
 
 require('./routes')(app)
-
 module.exports = app
