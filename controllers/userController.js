@@ -21,8 +21,27 @@ const userController = {
       const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10), null)
       return User
         .create({ name, email, password: hashPassword })
-        .then(() => res.redirect('/signin'))
+        .then(() => {
+          req.flash('success_msg', '你已成功註冊')
+          res.redirect('/signin')
+        })
     })
+  },
+
+  signInPage: (req, res) => {
+    return res.render('signin')
+  },
+
+  signIn: (req, res) => {
+    console.log('correct')
+    req.flash('success_msg', '成功登入')
+    res.redirect('/restaurants')
+  },
+
+  logout: (req, res) => {
+    req.logout()
+    req.flash('success_msg', '成功登出')
+    return res.redirect('/signin')
   }
 }
 
