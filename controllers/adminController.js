@@ -23,6 +23,12 @@ const adminController = {
         res.redirect('/admin/restaurants')
       })
       .catch(err => { return res.status(422).json(err) })
+  },
+
+  getRestaurant: (req, res) => {
+    Restaurant.findByPk(req.params.id, { raw: true })
+      .then((restaurant) => { return res.render('admin/restaurant', { restaurant }) })
+      .catch(err => { return res.status(422).json(err) })
   }
 
 }
