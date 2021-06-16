@@ -29,6 +29,26 @@ const adminController = {
     Restaurant.findByPk(req.params.id, { raw: true })
       .then((restaurant) => { return res.render('admin/restaurant', { restaurant }) })
       .catch(err => { return res.status(422).json(err) })
+  },
+
+  editRestaurant: (req, res) => {
+    Restaurant.findByPk(req.params.id, { raw: true })
+      .then((restaurant) => { return res.render('admin/create', { restaurant }) })
+      .catch(err => { return res.status(422).json(err) })
+  },
+
+  putRestaurant: (req, res) => {
+    if (!req.body.name) {
+      req.flash('err_msg', '請填入餐廳名稱')
+      return res.redirect('back')
+    }
+    return Restaurant.findByPk(req.params.id)
+      .then((restaurant) => restaurant.update(req.body))
+      .then(() => {
+        req.flash('success_msg', '資料更新成功')
+        return res.redirect('/admin/restaurants')
+      })
+      .catch(err => res.status(422).json(err))
   }
 
 }
