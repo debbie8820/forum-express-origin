@@ -13,7 +13,7 @@ module.exports = (app, passport) => {
       if (req.user.isAdmin) return next()
       return res.redirect('/')
     }
-    return res.redirect('signin')
+    return res.redirect('/signin')
   }
 
 
@@ -22,6 +22,8 @@ module.exports = (app, passport) => {
 
   app.get('/admin', authenticatedForAdmin, (req, res) => res.redirect('/admin/restaurants'))
   app.get('/admin/restaurants', authenticatedForAdmin, adminController.getRestaurants)
+  app.get('/admin/restaurants/create', authenticatedForAdmin, adminController.createRestaurant)
+  app.post('/admin/restaurants', authenticatedForAdmin, adminController.postRestaurant)
 
   app.get('/signup', userController.signUpPage)
   app.post('/signup', userController.signUp)
