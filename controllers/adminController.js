@@ -1,5 +1,6 @@
 const db = require('../models')
 const Restaurant = db.Restaurant
+const fs = require('fs')
 
 const adminController = {
   getRestaurants: (req, res) => {
@@ -17,12 +18,30 @@ const adminController = {
       req.flash('err_msg', '請填寫餐廳名稱')
       return res.redirect('back')
     }
-    return Restaurant.create(req.body)
-      .then(() => {
-        req.flash('success_msg', '餐廳已建立成功')
-        res.redirect('/admin/restaurants')
+    const { file } = req
+    if (file) {
+      fs.readFile(file.path, (err, data) => {
+        if (err) console.log('Error:', err)
+        fs.writeFile(`upload/${file.originalname}`, data, () => {
+          req.body.image = file ? `/upload/${file.originalname}` : null
+          return Restaurant.create(req.body)
+            .then(() => {
+              req.flash('success_msg', '餐廳已建立成功')
+              return res.redirect('/admin/restaurants')
+            })
+            .catch(err => { return res.status(422).json(err) })
+        })
       })
-      .catch(err => { return res.status(422).json(err) })
+    }
+    else {
+      req.body.image = null
+      return Restaurant.create(req.body)
+        .then(() => {
+          req.flash('success_msg', '餐廳已建立成功')
+          return res.redirect('/admin/restaurants')
+        })
+        .catch(err => { return res.status(422).json(err) })
+    }
   },
 
   getRestaurant: (req, res) => {
@@ -42,13 +61,31 @@ const adminController = {
       req.flash('err_msg', '請填入餐廳名稱')
       return res.redirect('back')
     }
-    return Restaurant.findByPk(req.params.id)
-      .then((restaurant) => restaurant.update(req.body))
-      .then(() => {
-        req.flash('success_msg', '資料更新成功')
-        return res.redirect('/admin/restaurants')
+    const { file } = req
+    if (file) {
+      fs.readFile(file.path, (err, data) => {
+        if (err) console.log('Error:', err)
+        fs.writeFile(`upload/${file.originalname}`, data, () => {
+          req.body.image = file ? `/upload/${file.originalname}` : null
+          return Restaurant.findByPk(req.params.id)
+            .then((restaurant) => restaurant.update(req.body))
+            .then(() => {
+              req.flash('success_msg', '資料更新成功')
+              return res.redirect('/admin/restaurants')
+            })
+            .catch(err => res.status(422).json(err))
+        })
       })
-      .catch(err => res.status(422).json(err))
+    }
+    else {
+      return Restaurant.findByPk(req.params.id)
+        .then((restaurant) => restaurant.update(req.body))
+        .then(() => {
+          req.flash('success_msg', '資料更新成功')
+          return res.redirect('/admin/restaurants')
+        })
+        .catch(err => res.status(422).json(err))
+    }
   },
 
   deleteRestaurant: (req, res) => {
