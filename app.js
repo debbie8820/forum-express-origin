@@ -8,7 +8,7 @@ const db = require('./models') //引入資料庫
 const methodOverride = require('method-override')
 
 const app = express()
-const port = 3000
+const port = process.env.PORT || 3000
 
 app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' })) //handlebars註冊樣板引擎
 app.set('view engine', 'hbs')
