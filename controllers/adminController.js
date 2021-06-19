@@ -6,7 +6,7 @@ const imgur = require('imgur-node-api')
 
 const adminController = {
   getRestaurants: (req, res) => {
-    return Restaurant.findAll({ raw: true })
+    return Restaurant.findAll({ raw: true, order: [['id', 'DESC']] })
       .then((restaurants) => res.render('admin/restaurants', { restaurants }))
       .catch(err => { return res.status(422).json(err) })
   },
