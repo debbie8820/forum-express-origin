@@ -1,9 +1,9 @@
 <h1>餐廳後台</h1>
 
-<a href='/admin/restaurants/create'>
+<a href='/admin/restaurants/create' style="text-decoration: none;">
   <button type="button" class="btn btn-primary">New Restaurant</button>
 </a>
-<a href='/admin/users'>
+<a href='/admin/users' style="text-decoration: none;">
   <button type="button" class="btn btn-outline-success">User Management</button>
 </a>
 
@@ -26,11 +26,11 @@
       <td>{{this.name}}</td>
       <td>
         <button type="button" class="btn btn-link">
-          <a href="/admin/restaurants/{{this.id}}">
+          <a href="/admin/restaurants/{{this.id}}" style="text-decoration: none;">
             Show
           </a>
         </button>
-        <button type="button" class="btn btn-link">
+        <button type="button" class="btn btn-link" style="text-decoration: none;">
           <a href="/admin/restaurants/{{this.id}}/edit">
             Edit
           </a>
