@@ -1,12 +1,18 @@
 const db = require('../models')
 const Restaurant = db.Restaurant
 const User = db.User
+const Category = db.Category
 const fs = require('fs')
 const imgur = require('imgur-node-api')
 
 const adminController = {
   getRestaurants: (req, res) => {
-    return Restaurant.findAll({ raw: true, order: [['id', 'DESC']] })
+    return Restaurant.findAll({
+      raw: true,
+      nest: true,
+      include: [Category], //在restaurants中一併帶入關聯資料內容，可用this.Category取出
+      order: [['id', 'DESC']]
+    })
       .then((restaurants) => res.render('admin/restaurants', { restaurants }))
       .catch(err => { return res.status(422).json(err) })
   },
@@ -45,8 +51,8 @@ const adminController = {
   },
 
   getRestaurant: (req, res) => {
-    Restaurant.findByPk(req.params.id, { raw: true })
-      .then((restaurant) => { return res.render('admin/restaurant', { restaurant }) })
+    Restaurant.findByPk(req.params.id, { include: [Category] })
+      .then((restaurant) => { return res.render('admin/restaurant', { restaurant: restaurant.toJSON() }) })
       .catch(err => { return res.status(422).json(err) })
   },
 
