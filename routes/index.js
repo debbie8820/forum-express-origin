@@ -3,6 +3,7 @@ const upload = multer({ dest: 'temp/' })
 const restController = require('../controllers/restController')
 const adminController = require('../controllers/adminController')
 const userController = require('../controllers/userController')
+const categoryController = require('../controllers/categoryController')
 const helpers = require('../_helpers')
 
 module.exports = (app, passport) => {
@@ -19,7 +20,7 @@ module.exports = (app, passport) => {
     return res.redirect('/signin')
   }
 
-
+  //Restaurant
   app.get('/', authenticated, (req, res) => res.redirect('/restaurants'))
   app.get('/restaurants', authenticated, restController.getRestaurants)
 
@@ -32,6 +33,7 @@ module.exports = (app, passport) => {
   app.put('/admin/restaurants/:id', authenticatedForAdmin, upload.single('image'), adminController.putRestaurant)
   app.delete('/admin/restaurants/:id', authenticatedForAdmin, adminController.deleteRestaurant)
 
+  //User
   app.get('/admin/users', authenticatedForAdmin, adminController.getUsers)
   app.put('/admin/users/:id/toggleAdmin', authenticatedForAdmin, adminController.toggleAdmin)
 
@@ -43,4 +45,7 @@ module.exports = (app, passport) => {
     failureRedirect: '/signin', failureFlash: true
   }), userController.signIn)
   app.get('/logout', userController.logout)
+
+  //Category
+  app.get('/admin/categories', authenticatedForAdmin, categoryController.getCategories)
 }
