@@ -14,7 +14,7 @@ const adminController = {
       order: [['id', 'DESC']]
     })
       .then((restaurants) => {
-        if (restaurants) return res.render('admin/restaurants', { restaurants })
+        if (restaurants.length) return res.render('admin/restaurants', { restaurants })
         req.flash('err_msg', '目前無餐廳資料')
         return res.redirect('/admin/restaurants')
       })
@@ -24,7 +24,7 @@ const adminController = {
   createRestaurant: (req, res, next) => {
     Category.findAll({ raw: true, nest: true })
       .then((categories) => {
-        if (!categories) {
+        if (!categories.length) {
           req.flash('err_msg', '請先加入餐廳分類資料')
           return res.redirect('/admin/restaurants')
         }
@@ -77,7 +77,7 @@ const adminController = {
   editRestaurant: (req, res, next) => {
     Category.findAll({ raw: true, nest: true })
       .then(categories => {
-        if (!categories) {
+        if (!categories.length) {
           req.flash('err_msg', '請先加入餐廳分類資料')
           return res.redirect('/admin/restaurants')
         }
@@ -154,7 +154,7 @@ const adminController = {
   getUsers: (req, res, next) => {
     return User.findAll({ raw: true })
       .then((users) => {
-        if (users) return res.render('admin/users', { users })
+        if (users.length) return res.render('admin/users', { users })
         req.flash('err_msg', '目前無使用者資料')
         res.redirect('/admin/users')
       })
