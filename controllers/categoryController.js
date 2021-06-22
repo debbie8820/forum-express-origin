@@ -10,6 +10,16 @@ const categoryController = {
         return res.redirect('/admin/categories')
       })
       .catch(err => next(err))
+  },
+
+  postCategory: (req, res, next) => {
+    if (!req.body.name) {
+      req.flash('err_msg', '請填寫欄位')
+      return res.redirect('back')
+    }
+    return Category.create(req.body)
+      .then(() => { return res.redirect('/admin/categories') })
+      .catch(err => next(err))
   }
 }
 
