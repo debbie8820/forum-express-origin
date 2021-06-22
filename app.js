@@ -34,4 +34,8 @@ app.listen(port, () => {
 })
 
 require('./routes')(app, passport)
+app.use((err, req, res, next) => {
+  return res.status(500).json({ Error: String(err) })
+})
+
 module.exports = app
