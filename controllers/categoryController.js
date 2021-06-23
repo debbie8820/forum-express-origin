@@ -53,6 +53,19 @@ const categoryController = {
           .then(() => { return res.redirect('/admin/categories') })
       })
       .catch(err => next(err))
+  },
+
+  deleteCategory: (req, res, next) => { //注意要確定沒有餐廳使用該分類才能刪除，否則會出錯(ForeignKeyConstraintError)
+    return Category.findByPk(req.params.id)
+      .then(category => {
+        if (!category) {
+          req.flash('err_msg', '查無此餐廳分類')
+          return res.redirect('/admin/categories')
+        }
+        return category.destroy()
+          .then(() => { return res.redirect('/admin/categories') })
+      })
+      .catch(err => next(err))
   }
 }
 

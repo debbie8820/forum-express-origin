@@ -51,4 +51,5 @@ module.exports = (app, passport) => {
   app.post('/admin/categories', authenticatedForAdmin, categoryController.postCategory)
   app.get('/admin/categories/:id', authenticatedForAdmin, categoryController.getCategories)
   app.put('/admin/categories/:id', authenticatedForAdmin, categoryController.putCategory)
+  app.delete('/admin/categories/:id', authenticatedForAdmin, categoryController.deleteCategory)
 }
