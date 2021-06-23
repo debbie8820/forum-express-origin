@@ -3,7 +3,7 @@ const Restaurant = db.Restaurant
 const Category = db.Category
 
 const restController = {
-  getRestaurants: (req, res) => {
+  getRestaurants: (req, res, next) => {
     Restaurant.findAll({ include: Category })
       .then(restaurants => {
         if (!restaurants.length) {
@@ -17,6 +17,19 @@ const restController = {
         }))
         return res.render('restaurants', { restaurants: data })
       })
+      .catch(err => next(err))
+  },
+
+  getRestaurant: (req, res, next) => {
+    Restaurant.findByPk(req.params.id, { include: Category })
+      .then(restaurant => {
+        if (!restaurant) {
+          req.flash('err_msg', '無該餐廳的資料')
+          res.redirect('back')
+        }
+        return res.render('restaurant', { restaurant: restaurant.toJSON() })
+      })
+      .catch(err => next(err))
   }
 }
 
