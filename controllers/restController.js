@@ -4,7 +4,13 @@ const Category = db.Category
 
 const restController = {
   getRestaurants: (req, res, next) => {
-    Restaurant.findAll({ include: Category })
+    const whereQuery = {}
+    let categoryId = ''
+    if (req.query.categoryId) {
+      categoryId = Number(req.query.categoryId)
+      whereQuery.CategoryId = categoryId
+    }
+    Restaurant.findAll({ include: Category, where: whereQuery })
       .then(restaurants => {
         if (!restaurants.length) {
           req.flash('err_msg', '目前無餐廳資料')
@@ -15,7 +21,14 @@ const restController = {
           description: r.dataValues.description.substring(0, 50),
           categoryName: r.Category.name
         }))
-        return res.render('restaurants', { restaurants: data })
+        Category.findAll({ raw: true, nest: true })
+          .then(categories => {
+            if (!categories.length) {
+              req.flash('err_msg', '目前無分類資料')
+              res.redirect('/')
+            }
+            return res.render('restaurants', { restaurants: data, categories, categoryId })
+          })
       })
       .catch(err => next(err))
   },
