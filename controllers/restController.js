@@ -1,6 +1,8 @@
 const db = require('../models')
 const Restaurant = db.Restaurant
 const Category = db.Category
+const User = db.User
+const Comment = db.Comment
 const pageLimit = 10
 
 const restController = {
@@ -47,7 +49,10 @@ const restController = {
   },
 
   getRestaurant: (req, res, next) => {
-    Restaurant.findByPk(req.params.id, { include: Category })
+    Restaurant.findByPk(req.params.id, {
+      include: [Category,
+        { model: Comment, include: [User] }] //一併取出關聯資料
+    })
       .then(restaurant => {
         if (!restaurant) {
           req.flash('err_msg', '無該餐廳的資料')
