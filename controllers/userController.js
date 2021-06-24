@@ -1,6 +1,7 @@
 const db = require('../models')
 const User = db.User
 const bcrypt = require('bcryptjs')
+const imgur = require('imgur-node-api')
 
 const userController = {
   signUpPage: (req, res) => {
@@ -43,6 +44,70 @@ const userController = {
     req.logout()
     req.flash('success_msg', '成功登出')
     return res.redirect('/signin')
+  },
+
+  getUser: (req, res, next) => {
+    User.findByPk(req.params.id)
+      .then((user) => {
+        if (!user) {
+          req.flash('err_msg', '查無此使用者資料')
+          return res.redirect('/restaurants')
+        }
+        return res.render('user', { User: user.toJSON() })
+      })
+  },
+
+  editUser: (req, res, next) => {
+    User.findByPk(req.params.id)
+      .then((user) => {
+        if (!user) {
+          req.flash('err_msg', '查無此使用者資料')
+          return res.redirect('/restaurants')
+        }
+        return res.render('userEdit', { User: user.toJSON() })
+      })
+  },
+
+  putUser: (req, res, next) => {
+    if (!req.body.name) {
+      req.flash('err_msg', '請填寫使用者名稱')
+      return res.redirect('back')
+    }
+    const { file } = req
+    if (file) {
+      imgur.setClientID(process.env.IMGUR_CLIENT_ID)
+      imgur.upload(file.path, (err, img) => {
+        req.body.image = file ? img.data.link : null
+        return User.findByPk(req.params.id)
+          .then((user) => {
+            if (!user) {
+              req.flash('err_msg', '查無此使用者資料')
+              return res.redirect('back')
+            }
+            return user.update(req.body)
+              .then(() => {
+                req.flash('success_msg', '資料已成功更新')
+                return res.redirect(`/users/${req.params.id}`)
+              })
+          })
+          .catch(err => next(err))
+      })
+    } else {
+      return User.findByPk(req.params.id)
+        .then((user) => {
+          if (!user) {
+            req.flash('err_msg', '查無此使用者資料')
+            return res.redirect('back')
+          }
+          return user.update(req.body)
+            .then(() => {
+              req.flash('success_msg', '資料已成功更新')
+              return res.redirect(`/users/${req.params.id}`)
+            })
+        })
+        .catch(err => next(err))
+    }
   }
 }
+
 module.exports = userController
