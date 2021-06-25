@@ -55,10 +55,13 @@ const restController = {
     })
       .then(restaurant => {
         if (!restaurant) {
-          req.flash('err_msg', '無該餐廳的資料')
+          req.flash('err_msg', '查無此餐廳資料')
           res.redirect('back')
         }
-        return res.render('restaurant', { restaurant: restaurant.toJSON() })
+        return restaurant.increment('viewCounts')
+          .then((restaurant) => {
+            return res.render('restaurant', { restaurant: restaurant.toJSON() })
+          })
       })
       .catch(err => next(err))
   },
