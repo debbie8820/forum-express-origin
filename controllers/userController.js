@@ -1,5 +1,7 @@
 const db = require('../models')
 const User = db.User
+const Comment = db.Comment
+const Restaurant = db.Restaurant
 const bcrypt = require('bcryptjs')
 const imgur = require('imgur-node-api')
 
@@ -53,8 +55,12 @@ const userController = {
           req.flash('err_msg', '查無此使用者資料')
           return res.redirect('/restaurants')
         }
-        return res.render('user', { User: user.toJSON() })
+        Comment.findAndCountAll({ raw: true, nest: true, include: [Restaurant], where: { UserId: req.params.id } })
+          .then(result => {
+            return res.render('user', { User: user.toJSON(), totalComments: result.count, comments: result.rows })
+          })
       })
+      .catch(err => next(err))
   },
 
   editUser: (req, res, next) => {
@@ -66,6 +72,7 @@ const userController = {
         }
         return res.render('userEdit', { User: user.toJSON() })
       })
+      .catch(err => next(err))
   },
 
   putUser: (req, res, next) => {
