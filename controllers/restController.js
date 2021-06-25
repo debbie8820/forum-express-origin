@@ -61,6 +61,31 @@ const restController = {
         return res.render('restaurant', { restaurant: restaurant.toJSON() })
       })
       .catch(err => next(err))
+  },
+
+  getFeeds: (req, res, next) => {
+    return Promise.all //比起先找出餐廳資料再用.then找出評論會更省時(能同步進行，不用等待)
+      ([
+        Restaurant.findAll({
+          raw: true,
+          nest: true,
+          limit: 10,
+          include: [Category],
+          order: [['createdAt', 'DESC']]
+        }),
+
+        Comment.findAll({
+          raw: true,
+          nest: true,
+          limit: 10,
+          include: [User, Restaurant],
+          order: [['createdAt', 'DESC']]
+        })
+      ])
+      .then(([restaurants, comments]) => {
+        return res.render('feeds', { restaurants, comments })
+      })
+      .catch(err => next(err))
   }
 }
 
