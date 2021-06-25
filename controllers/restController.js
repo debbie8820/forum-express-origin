@@ -86,6 +86,18 @@ const restController = {
         return res.render('feeds', { restaurants, comments })
       })
       .catch(err => next(err))
+  },
+
+  getDashboard: (req, res, next) => {
+    Restaurant.findByPk(req.params.id, { include: [Category, Comment] })
+      .then(restaurant => {
+        if (!restaurant) {
+          req.flash('err_msg', '無該餐廳的資料')
+          res.redirect('back')
+        }
+        return res.render('dashboard', { restaurant: restaurant.toJSON() })
+      })
+      .catch(err => next(err))
   }
 }
 
