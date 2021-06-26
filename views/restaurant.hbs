@@ -24,6 +24,14 @@
       <form action="/favorite/{{restaurant.id}}" method="POST" style="display: contents;"><button type="submit"
           class="btn btn-primary ml-3">加到最愛</button></form>
       {{/if}}
+      {{#if isLiked}}
+      <form action="/like/{{restaurant.id}}?_method=DELETE" method="POST" style="display: inline;"><button type="submit"
+          class="btn btn-danger ml-1">Unlike</button></form>
+      {{else}}
+      <form action="/like/{{restaurant.id}}" method="POST" style="display: inline;"><button type="submit"
+          class="btn btn-warning text-white ml-1">Like</button>
+      </form>
+      {{/if}}
     </button>
   </div>
   <hr>

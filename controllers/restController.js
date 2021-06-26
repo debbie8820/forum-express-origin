@@ -35,7 +35,8 @@ const restController = {
           ...r.dataValues, //...r的寫法把餐廳陣列拆成一個個物件
           description: r.dataValues.description.substring(0, 50),
           categoryName: r.dataValues.Category.name,
-          isFavorited: req.user.FavoritedRestaurants.map((d => d.id)).includes(r.id)
+          isFavorited: req.user.FavoritedRestaurants.map((d => d.id)).includes(r.id),
+          isLiked: req.user.LikedRestaurants.map(d => d.id).includes(r.id)
         }))
         Category.findAll({ raw: true, nest: true })
           .then(categories => {
@@ -53,7 +54,8 @@ const restController = {
     Restaurant.findByPk(req.params.id, {
       include: [Category,
         { model: Comment, include: [User] },
-        { model: User, as: 'FavoritedUsers' }] //一併取出關聯資料
+        { model: User, as: 'FavoritedUsers' },
+        { model: User, as: 'GiveLikesUsers' }] //一併取出關聯資料
     })
       .then(restaurant => {
         if (!restaurant) {
@@ -64,7 +66,8 @@ const restController = {
           .then((restaurant) => {
             const isFavorited = restaurant.FavoritedUsers.map(d =>
               d.id).includes(req.user.id)
-            return res.render('restaurant', { restaurant: restaurant.toJSON(), isFavorited })
+            const isLiked = restaurant.GiveLikesUsers.map(d => d.id).includes(req.user.id)
+            return res.render('restaurant', { restaurant: restaurant.toJSON(), isFavorited, isLiked })
           })
       })
       .catch(err => next(err))

@@ -3,6 +3,7 @@ const User = db.User
 const Comment = db.Comment
 const Restaurant = db.Restaurant
 const Favorite = db.Favorite
+const Like = db.Like
 const bcrypt = require('bcryptjs')
 const imgur = require('imgur-node-api')
 
@@ -140,6 +141,45 @@ const userController = {
         }
         return favorite.destroy()
           .then(() => { return res.redirect('/restaurants') })
+      })
+      .catch(err => next(err))
+  },
+
+  likeRestaurant: (req, res, next) => {
+    return Like.findOne({
+      where: {
+        UserId: req.user.id,
+        RestaurantId: req.params.restaurantId
+      }
+    })
+      .then((result) => {
+        if (result) {
+          req.flash('err_msg', '已為此餐廳按讚')
+          return res.redirect('/restaurants')
+        }
+        return Like.create({
+          UserId: req.user.id,
+          RestaurantId: req.params.restaurantId
+        })
+          .then(() => { return res.redirect('back') })
+      })
+      .catch(err => next(err))
+  },
+
+  unlikeRestaurant: (req, res, next) => {
+    return Like.findOne({
+      where: {
+        UserId: req.user.id,
+        RestaurantId: req.params.restaurantId
+      }
+    })
+      .then((result) => {
+        if (!result) {
+          req.flash('err_msg', '您並未按讚此餐廳')
+          return res.redirect('/restaurants')
+        }
+        return result.destroy()
+          .then(() => { return res.redirect('back') })
       })
       .catch(err => next(err))
   }
