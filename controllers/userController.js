@@ -2,6 +2,7 @@ const db = require('../models')
 const User = db.User
 const Comment = db.Comment
 const Restaurant = db.Restaurant
+const Favorite = db.Favorite
 const bcrypt = require('bcryptjs')
 const imgur = require('imgur-node-api')
 
@@ -114,6 +115,33 @@ const userController = {
         })
         .catch(err => next(err))
     }
+  },
+
+  addFavorite: (req, res, next) => {
+    return Favorite.create({
+      UserId: req.user.id,
+      RestaurantId: req.params.restaurantId
+    })
+      .then(() => { return res.redirect('back') })
+      .catch(err => next(err))
+  },
+
+  removeFavorite: (req, res, next) => {
+    return Favorite.findOne({
+      where: {
+        UserId: req.user.id,
+        RestaurantId: req.params.restaurantId
+      }
+    })
+      .then((favorite) => {
+        if (!favorite) {
+          req.flash('err_msg', '使用者目前無收藏此餐廳')
+          return res.redirect('/restaurants')
+        }
+        return favorite.destroy()
+          .then(() => { return res.redirect('/restaurants') })
+      })
+      .catch(err => next(err))
   }
 }
 
