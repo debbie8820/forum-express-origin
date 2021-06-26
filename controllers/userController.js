@@ -119,11 +119,23 @@ const userController = {
   },
 
   addFavorite: (req, res, next) => {
-    return Favorite.create({
-      UserId: req.user.id,
-      RestaurantId: req.params.restaurantId
+    return Favorite.findOne({
+      where: {
+        UserId: req.user.id,
+        RestaurantId: req.params.restaurantId
+      }
     })
-      .then(() => { return res.redirect('back') })
+      .then((result) => {
+        if (result) {
+          req.flash('err_msg', '此餐廳已加入最愛')
+          return res.redirect('/restaurants')
+        }
+        return Favorite.create({
+          UserId: req.user.id,
+          RestaurantId: req.params.restaurantId
+        })
+          .then(() => { return res.redirect('back') })
+      })
       .catch(err => next(err))
   },
 
