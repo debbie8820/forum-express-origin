@@ -4,6 +4,7 @@ const Comment = db.Comment
 const Restaurant = db.Restaurant
 const Favorite = db.Favorite
 const Like = db.Like
+const Followship = db.Followship
 const bcrypt = require('bcryptjs')
 const imgur = require('imgur-node-api')
 
@@ -212,6 +213,45 @@ const userController = {
         }))
         users.sort((a, b) => b.totalFollower - a.totalFollower)
         return res.render('topUsers', { users })
+      })
+      .catch(err => next(err))
+  },
+
+  addFollowing: (req, res, next) => {
+    Followship.findOne({
+      where: {
+        followerId: req.user.id,
+        followingId: req.params.userId
+      }
+    })
+      .then((result) => {
+        if (result) {
+          req.flash('err_msg', '已在追蹤此使用者')
+          return res.redirect('/users/top')
+        }
+        return Followship.create({
+          followerId: req.user.id,
+          followingId: req.params.userId
+        })
+          .then(() => { return res.redirect('back') })
+      })
+      .catch(err => next(err))
+  },
+
+  removeFollowing: (req, res, next) => {
+    Followship.findOne({
+      where: {
+        followerId: req.user.id,
+        followingId: req.params.userId
+      }
+    })
+      .then((result) => {
+        if (!result) {
+          req.flash('err_msg', '您未追蹤此使用者')
+          return res.redirect('/users/top')
+        }
+        return result.destroy()
+          .then(() => { return res.redirect('back') })
       })
       .catch(err => next(err))
   }

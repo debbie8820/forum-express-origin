@@ -19,7 +19,7 @@
       <img class="" src="{{this.image}}" width="140px" height="140px">
     </a>
     <h2>{{this.name}}</h2>
-    <span class="badge badge-secondary">追蹤人數：{{this.FollowerCount}}</span>
+    <span class="badge badge-secondary">追蹤人數：{{this.totalFollower}}</span>
     <p>
       {{#if this.isFollowed }}
     <form action="/following/{{this.id}}?_method=DELETE" method="POST" style="display: contents;"><button type="submit"
