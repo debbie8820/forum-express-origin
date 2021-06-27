@@ -99,13 +99,34 @@ const restController = {
   },
 
   getDashboard: (req, res, next) => {
-    Restaurant.findByPk(req.params.id, { include: [Category, Comment] })
+    Restaurant.findByPk(req.params.id, { include: [Category, Comment, { model: User, as: 'FavoritedUsers' }] })
       .then(restaurant => {
         if (!restaurant) {
           req.flash('err_msg', '無該餐廳的資料')
           res.redirect('back')
         }
         return res.render('dashboard', { restaurant: restaurant.toJSON() })
+      })
+      .catch(err => next(err))
+  },
+
+  getTopRestaurants: (req, res, next) => {
+    return Restaurant.findAll({
+      include: [{ model: User, as: 'FavoritedUsers' }]
+    })
+      .then((restaurants) => {
+        if (!restaurants.length) {
+          req.flash('err_msg', '目前無任何餐廳資料')
+          return res.redirect('/restaurants/top')
+        }
+        let data = restaurants.map(restaurant => ({
+          ...restaurant.dataValues,
+          description: restaurant.dataValues.description.substring(0, 200),
+          totalFavoritedUsers: restaurant.FavoritedUsers.length,
+          isFavorited: restaurant.FavoritedUsers.map((d => d.id)).includes(req.user.id)
+        }))
+        data = data.sort((a, b) => b.totalFavoritedUsers - a.totalFavoritedUsers).slice(0, 10)
+        return res.render('topRestaurants', { restaurants: data })
       })
       .catch(err => next(err))
   }
