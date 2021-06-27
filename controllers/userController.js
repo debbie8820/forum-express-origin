@@ -7,7 +7,7 @@ const Like = db.Like
 const Followship = db.Followship
 const bcrypt = require('bcryptjs')
 const imgur = require('imgur-node-api')
-const { sequelize } = require('../models')
+const Sequelize = require('sequelize')
 
 const userController = {
   signUpPage: (req, res) => {
