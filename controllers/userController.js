@@ -7,6 +7,7 @@ const Like = db.Like
 const Followship = db.Followship
 const bcrypt = require('bcryptjs')
 const imgur = require('imgur-node-api')
+const { sequelize } = require('../models')
 
 const userController = {
   signUpPage: (req, res) => {
@@ -52,15 +53,30 @@ const userController = {
   },
 
   getUser: (req, res, next) => {
-    User.findByPk(req.params.id)
+    User.findByPk(req.params.id, {
+      include: [
+        { model: Restaurant, as: 'FavoritedRestaurants' },
+        { model: User, as: 'Followers' },
+        { model: User, as: 'Followings' }
+      ]
+    })
       .then((user) => {
         if (!user) {
           req.flash('err_msg', '查無此使用者資料')
           return res.redirect('/restaurants')
         }
-        Comment.findAndCountAll({ raw: true, nest: true, include: [Restaurant], where: { UserId: req.params.id } })
-          .then(result => {
-            return res.render('user', { User: user.toJSON(), totalComments: result.count, comments: result.rows })
+
+        return Comment.findAll({ //從Comment找出已評論餐廳(排除重複餐廳)
+          raw: true,
+          nest: true,
+          include: [Restaurant],
+          where: { UserId: req.params.id },
+          attributes: [
+            [Sequelize.fn('DISTINCT', Sequelize.col('RestaurantId')), 'RestaurantId']
+          ]
+        })
+          .then((comments) => { //設定User為頁面擁有者(和req.user登入者區分)
+            res.render('user', { User: user.toJSON(), comments })
           })
       })
       .catch(err => next(err))

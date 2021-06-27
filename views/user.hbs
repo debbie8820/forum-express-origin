@@ -7,7 +7,10 @@
       <div class="card-body">
         <h5 class="card-title">{{User.name}}</h5>
         <p class="card-text">{{User.email}}</p>
-        <p class="card-text">已評論餐廳：{{totalComments}}</p>
+        <p class="card-text mb-0">{{comments.length}} 已評論餐廳</p>
+        <p class="card-text mb-0">{{User.FavoritedRestaurants.length}} 已收藏餐廳</p>
+        <p class="card-text mb-0">{{User.Followings.length}} followings</p>
+        <p class="card-text">{{User.Followers.length}} followers</p>
         {{#ifCond user.id User.id}} {{!//user是res.locals(登入者), User才是頁面擁有者}}
         <a href="/users/{{../User.id}}/edit" class="btn btn-primary">Edit</a>
         {{/ifCond}}
@@ -16,19 +19,75 @@
   </div>
 </div>
 
-<div class="col-md-12 p-0" style="max-width: 100%;">
-  <div class="card h-100" style="max-width: 100%;">
-    <div class="card-footer">
-      <p class="mb-0"><b>{{totalComments}} 間已評論餐廳</b></p>
-    </div>
-    <div class="card-body d-flex" style="overflow: scroll">
-      {{#each comments}}
-      <div class="col-md-2">
-        <a href="/restaurants/{{this.RestaurantId}}">
-          <img src="{{this.Restaurant.image}}" class="card-img-top" alt="餐廳照片">
-        </a>
+<div class="d-flex justify-content-between mb-3">
+  <div class="col-md-12 p-0" style="max-width: 48%;">
+    <div class="card h-100" style="max-width: 100%;">
+      <div class="card-footer">
+        <p class="mb-0"><b>{{User.Followings.length}} followings</b></p>
       </div>
-      {{/each}}
+      <div class="card-body d-flex p-0" style="overflow: scroll; min-height: 70px;">
+        {{#each User.Followings}}
+        <div class="col-md-2 p-1">
+          <a href="/users/{{this.id}}">
+            <img src="{{this.image}}" class="card-img-top p-0 h-100" alt="追蹤者照片">
+          </a>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+
+
+  <div class="col-md-12 p-0" style="max-width: 48%;">
+    <div class="card h-100" style="max-width: 100%;">
+      <div class="card-footer">
+        <p class="mb-0"><b>{{comments.length}} 間已評論餐廳</b></p>
+      </div>
+      <div class="card-body d-flex p-0" style="overflow: scroll min-height: 70px;">
+        {{#each comments}}
+        <div class="col-md-2 p-1">
+          <a href="/restaurants/{{this.RestaurantId}}">
+            <img src="{{this.Restaurant.image}}" class="card-img-top p-0 h-100" alt="餐廳照片">
+          </a>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex justify-content-between">
+  <div class="col-md-12 p-0" style="max-width: 48%;">
+    <div class="card h-100" style="max-width: 100%;">
+      <div class="card-footer">
+        <p class="mb-0"><b>{{User.Followers.length}} followers</b></p>
+      </div>
+      <div class="card-body d-flex p-0" style="overflow: scroll min-height: 70px;">
+        {{#each User.Followers}}
+        <div class="col-md-2 p-1">
+          <a href="/users/{{this.id}}">
+            <img src="{{this.image}}" class="card-img-top p-0 h-100" alt="追蹤者照片">
+          </a>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12 p-0" style="max-width: 48%;">
+    <div class="card h-100" style="max-width: 100%;">
+      <div class="card-footer">
+        <p class="mb-0"><b>{{User.FavoritedRestaurants.length}} 間收藏的餐廳</b></p>
+      </div>
+      <div class="card-body d-flex p-0" style="overflow: scroll min-height: 70px;">
+        {{#each User.FavoritedRestaurants}}
+        <div class="col-md-2 p-1">
+          <a href="/restaurants/{{this.id}}">
+            <img src="{{this.image}}" class="card-img-top p-0 h-100" alt="收藏餐廳照片">
+          </a>
+        </div>
+        {{/each}}
+      </div>
     </div>
   </div>
 </div>
