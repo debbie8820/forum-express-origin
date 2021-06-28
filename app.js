@@ -33,7 +33,7 @@ app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
 
-require('./routes')(app, passport)
+require('./routes')(app)
 app.use((err, req, res, next) => {
   return res.status(500).json({ Error: String(err) })
 })
