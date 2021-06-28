@@ -49,15 +49,7 @@ const adminController = {
   },
 
   getRestaurant: (req, res, next) => {
-    Restaurant.findByPk(req.params.id, { include: [Category] })
-      .then((restaurant) => {
-        if (!restaurant) {
-          req.flash('err_msg', '查無該餐廳資料')
-          return res.redirect('/admin/restaurants')
-        }
-        return res.render('admin/restaurant', { restaurant: restaurant.toJSON() })
-      })
-      .catch(err => next(err))
+    adminService.getRestaurant(req, res, (data) => { return res.render('admin/restaurant', data) }, next)
   },
 
   editRestaurant: (req, res, next) => {
