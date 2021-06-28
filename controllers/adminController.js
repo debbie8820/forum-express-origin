@@ -114,19 +114,12 @@ const adminController = {
   },
 
   deleteRestaurant: (req, res, next) => {
-    return Restaurant.findByPk(req.params.id)
-      .then((restaurant) => {
-        if (!restaurant) {
-          req.flash('err_msg', '查無該餐廳資料')
-          return res.redirect('/admin/restaurants')
-        }
-        return restaurant.destroy()
-          .then(() => {
-            req.flash('success_msg', '餐廳已成功移除')
-            return res.redirect('/admin/restaurants')
-          })
-      })
-      .catch(err => next(err))
+    adminService.deleteRestaurant(req, res, (data) => {
+      if (data.status === 'success') {
+        req.flash('success_msg', '餐廳已成功移除')
+        return res.redirect('/admin/restaurants')
+      }
+    })
   },
 
   getUsers: (req, res, next) => {

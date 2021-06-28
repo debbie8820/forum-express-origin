@@ -26,7 +26,22 @@ const adminService = {
         return cb({ restaurant: restaurant.toJSON() })
       })
       .catch(err => next(err))
-  }
+  },
+
+  deleteRestaurant: (req, res, cb, next) => {
+    return Restaurant.findByPk(req.params.id)
+      .then((restaurant) => {
+        if (!restaurant) {
+          req.flash('err_msg', '查無該餐廳資料')
+          return res.redirect('/admin/restaurants')
+        }
+        return restaurant.destroy()
+          .then(() => {
+            return cb({ status: 'success', message: '' })
+          })
+      })
+      .catch(err => next(err))
+  },
 }
 
 module.exports = adminService
