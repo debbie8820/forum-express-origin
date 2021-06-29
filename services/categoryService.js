@@ -18,6 +18,21 @@ const categoryService = {
         }
       })
       .catch(err => next(err))
+  },
+
+  postCategory: (req, res, cb, next) => {
+    if (!req.body.name) {
+      return cb({ status: 'error', message: '請填寫欄位' })
+    }
+    Category.findAll({ where: { name: req.body.name } })
+      .then((category) => {
+        if (category.length) {
+          return cb({ status: 'error', message: '此類別已存在' })
+        }
+        return Category.create(req.body)
+          .then(() => { return cb({ status: 'success', message: '類別建立成功' }) })
+      })
+      .catch(err => next(err))
   }
 }
 
