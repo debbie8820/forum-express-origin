@@ -45,6 +45,17 @@ const categoryService = {
           .catch(err => next(err))
       })
       .catch(err => next(err))
+  },
+
+  deleteCategory: (req, res, cb, next) => { //注意要確定沒有餐廳使用該分類才能刪除，否則會出錯(ForeignKeyConstraintError)
+    return Category.findByPk(req.params.id)
+      .then(category => {
+        if (!category) return cb({ status: 'error', message: '查無此餐廳分類' })
+        return category.destroy()
+          .then(() => { return cb({ status: 'success', message: '類別已成功刪除' }) })
+          .catch(err => next(err))
+      })
+      .catch(err => next(err))
   }
 }
 
