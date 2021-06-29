@@ -66,6 +66,42 @@ const adminService = {
     }
   },
 
+  putRestaurant: (req, res, cb, next) => {
+    if (!req.body.name) {
+      return cb({ status: 'error', message: '請填寫餐廳名稱' })
+    }
+    const { file } = req
+    if (file) {
+      imgur.setClientID(process.env.IMGUR_CLIENT_ID)
+      imgurPromise(file.path)
+        .then(img => {
+          return Restaurant.findByPk(req.params.id)
+            .then((restaurant) => {
+              if (!restaurant) return cb({ status: 'error', message: '查無該餐廳資料' })
+              req.body.image = file ? img.data.link : null
+              return restaurant.update(req.body)
+                .then(() => {
+                  return cb({ status: 'success', message: '資料更新成功' })
+                })
+                .catch(err => next(err))
+            })
+            .catch(err => next(err))
+        })
+
+    }
+    else {
+      return Restaurant.findByPk(req.params.id)
+        .then((restaurant) => {
+          if (!restaurant) return cb({ status: 'error', message: '查無該餐廳資料' })
+          return restaurant.update(req.body)
+            .then(() => {
+              return cb({ status: 'success', message: '資料更新成功' })
+            })
+        })
+        .catch(err => next(err))
+    }
+  },
+
   deleteRestaurant: (req, res, cb, next) => {
     return Restaurant.findByPk(req.params.id)
       .then((restaurant) => {

@@ -43,7 +43,6 @@ const adminController = {
     }, next)
   },
 
-
   getRestaurant: (req, res, next) => {
     adminService.getRestaurant(req, res, (data) => { return res.render('admin/restaurant', data) }, next)
   },
@@ -68,48 +67,14 @@ const adminController = {
   },
 
   putRestaurant: (req, res, next) => {
-    if (!req.body.name) {
-      req.flash('err_msg', '請填入餐廳名稱')
-      return res.redirect('back')
-    }
-    const { file } = req
-    if (file) {
-      imgur.setClientID(process.env.IMGUR_CLIENT_ID)
-      imgurPromise(file.path)
-        .then(img => {
-          return Restaurant.findByPk(req.params.id)
-            .then((restaurant) => {
-              if (!restaurant) {
-                req.flash('err_msg', '查無該餐廳資料')
-                return res.redirect('/admin/restaurants')
-              }
-              req.body.image = file ? img.data.link : null
-              return restaurant.update(req.body)
-                .then(() => {
-                  req.flash('success_msg', '資料更新成功')
-                  return res.redirect('/admin/restaurants')
-                })
-                .catch(err => next(err))
-            })
-            .catch(err => next(err))
-        })
-
-    }
-    else {
-      return Restaurant.findByPk(req.params.id)
-        .then((restaurant) => {
-          if (!restaurant) {
-            req.flash('err_msg', '查無該餐廳資料')
-            return res.redirect('/admin/restaurants')
-          }
-          return restaurant.update(req.body)
-            .then(() => {
-              req.flash('success_msg', '資料更新成功')
-              return res.redirect('/admin/restaurants')
-            })
-        })
-        .catch(err => next(err))
-    }
+    adminService.putRestaurant(req, res, (data) => {
+      if (data.status === 'error') {
+        req.flash('err_msg', data.message)
+      } else {
+        req.flash('success_msg', data.message)
+      }
+      return res.redirect('/admin/restaurants')
+    }, next)
   },
 
   deleteRestaurant: (req, res, next) => {
