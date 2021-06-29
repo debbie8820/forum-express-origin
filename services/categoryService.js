@@ -33,6 +33,18 @@ const categoryService = {
           .then(() => { return cb({ status: 'success', message: '類別建立成功' }) })
       })
       .catch(err => next(err))
+  },
+
+  putCategory: (req, res, cb, next) => {
+    if (!req.body.name) return cb({ status: 'error', message: '請填寫欄位' })
+    return Category.findByPk(req.params.id)
+      .then((category) => {
+        if (!category) return cb({ status: 'error', message: '查無此餐廳分類' })
+        return category.update({ name: req.body.name })
+          .then(() => { return cb({ status: 'success', message: '類別更新成功' }) })
+          .catch(err => next(err))
+      })
+      .catch(err => next(err))
   }
 }
 
