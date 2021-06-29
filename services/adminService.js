@@ -1,4 +1,14 @@
 const { Restaurant, Category } = require('../models')
+const imgur = require('imgur-node-api')
+
+const imgurPromise = (filePath) => {
+  return new Promise((resolve, reject) => {
+    imgur.upload(filePath, (err, img) => {
+      if (err) return reject(err)
+      return resolve(img)
+    })
+  })
+}
 
 const adminService = {
   getRestaurants: (req, res, cb, next) => {
@@ -26,6 +36,34 @@ const adminService = {
         return cb({ restaurant: restaurant.toJSON() })
       })
       .catch(err => next(err))
+  },
+
+  postRestaurant: (req, res, cb, next) => {
+    if (!req.body.name) {
+      return cb({ status: 'error', message: '請填寫餐廳名稱' })
+    }
+    const { file } = req
+    if (file) {
+      imgur.setClientID(process.env.IMGUR_CLIENT_ID)
+      imgurPromise(file.path)
+        .then(img => {
+          req.body.image = file ? img.data.link : null
+          return Restaurant.create(req.body)
+            .then(() => {
+              return cb({ status: 'success', message: '餐廳已建立成功' })
+            })
+            .catch(err => next(err))
+        })
+        .catch(err => next(err))
+    }
+    else {
+      req.body.image = null
+      return Restaurant.create(req.body)
+        .then(() => {
+          return cb({ status: 'success', message: '餐廳已建立成功' })
+        })
+        .catch(err => next(err))
+    }
   },
 
   deleteRestaurant: (req, res, cb, next) => {

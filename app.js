@@ -15,7 +15,8 @@ if (process.env.NODE_ENV !== 'production') {
 
 app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs', helpers: require('./config/handlebars-helpers') })) //handlebars註冊樣板引擎
 app.set('view engine', 'hbs')
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: true })) //用來解析表單
+app.use(bodyParser.json()) //用來解析json
 app.use(session({ secret: 'secret', resave: 'false', saveUninitialized: false }))
 app.use(passport.initialize())
 app.use(passport.session())
